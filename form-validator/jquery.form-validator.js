@@ -104,7 +104,6 @@
         // Remove possible error style applied by previous validation
         $element
             .removeClass(config.errorElementClass)
-            .css('border-color', '')
             .parent()
                 .find('.'+config.errorMessageClass).remove();
 
@@ -119,6 +118,8 @@
 
         var validation = $.formUtils.validateInput($element, language, config, $form, eventContext);
 
+        console.log(validation);
+
         if(validation === true) {
             $element
                 .addClass('valid')
@@ -129,7 +130,7 @@
                 .removeClass('valid')
                 .parent()
                     .removeClass('has-error')
-                    .removeClass('has-success');
+                    .removeClass('has-success');        
         } else {
             $element
                 .addClass(config.errorElementClass)
@@ -145,10 +146,6 @@
                 var $parent = $element.parent();
                 $parent.append('<span class="'+config.errorMessageClass+' help-block">'+validation+'</span>');
                 $parent.addClass('has-error'); // twitter bs
-            }
-
-            if(config.borderColorOnError !== '') {
-                $element.css('border-color', config.borderColorOnError);
             }
 
             if(attachKeyupEvent) {
@@ -272,8 +269,7 @@
         // Reset style and remove error class
         //
         $form.find('.has-error').removeClass('has-error');
-        $form.find('input,textarea,select')
-            .css('border-color', '')
+        $form.find('input,textarea,select')            
             .removeClass(config.errorElementClass);
 
         //
@@ -301,10 +297,7 @@
             $.formUtils.isValidatingEntireForm = false;
 
             // Apply error style to invalid inputs
-            $.each(errorInputs, function(i, $input) {
-                if (config.borderColorOnError !== '') {
-                    $input.css('border-color', config.borderColorOnError);
-                }
+            $.each(errorInputs, function(i, $input) {                
                 $input
                     .addClass(config.errorElementClass)
                     .parent()
@@ -722,6 +715,10 @@
                 return config.addValidClassOnAll ? true:null;
             }
 
+            if( value.trim() === '' && validationRules.indexOf('required') === -1 ) {
+                return null;
+            }
+
             $.split(validationRules, function(rule) {
                 if( rule.indexOf('validate_') !== 0 ) {
                     rule = 'validate_' + rule;
@@ -803,8 +800,8 @@
             year = findDateUnit('y', formatParts, matches);
         
             if ((month === 2 && day > 28 && (year % 4 !== 0  || year % 100 === 0 && year % 400 !== 0)) 
-            	|| (month === 2 && day > 29 && (year % 4 === 0 || year % 100 !== 0 && year % 400 === 0))
-            	|| month > 12 || month === 0) {
+                || (month === 2 && day > 29 && (year % 4 === 0 || year % 100 !== 0 && year % 400 === 0))
+                || month > 12 || month === 0) {
                 return false;
             }
             if ((this.isShortMonth(month) && day > 30) || (!this.isShortMonth(month) && day > 31) || day === 0) {
@@ -1374,7 +1371,7 @@
                 additionalChars = $el.attr('data-validation-allowing'),
                 pattern = '';
 
-            if( additionalChars ) {
+            if( additionalChars) {
                 pattern = patternStart + additionalChars + patternEnd;
                 var extra = additionalChars.replace(/\\/g, '');
                 if( extra.indexOf(' ') > -1 ) {
@@ -1386,8 +1383,9 @@
                 pattern = patternStart + patternEnd;
                 this.errorMessage = language.badAlphaNumeric;
             }
-
+        
             return new RegExp(pattern).test(val);
+            
         },
         errorMessage : '',
         errorMessageKey: ''
